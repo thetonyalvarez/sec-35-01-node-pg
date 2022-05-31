@@ -30,8 +30,9 @@ router.get("/", async (req, res, next) => {
 });
 
 /**
+ * TODO
  * GET /companies/[code]
- * Return obj of company: {company: {code, name, description}}
+ * Return obj of company: {company: {code, name, description, invoices: [id, ...]}}
  * If the company given cannot be found, this should return a 404 status response.
  */
 

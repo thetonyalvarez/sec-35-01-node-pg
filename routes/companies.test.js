@@ -100,7 +100,7 @@ describe("PUT /companies/[code]", () => {
 	});
 });
 
-describe("DELETE /companies[code]", () => {
+describe("DELETE /companies/[code]", () => {
 	it("should delete a company from the db", async () => {
 		let response = await request(app).delete(`/companies/acme`);
 		expect(response.body.message).toEqual("Deleted");
