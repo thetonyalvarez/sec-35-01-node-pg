@@ -20,12 +20,12 @@ describe("GET /invoices", () => {
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.invoices).toContainEqual(
 			expect.objectContaining({
-				comp_code: "acme",
+				comp_code: "acmecorp",
 			})
 		);
 		expect(response.body.invoices).toContainEqual(
 			expect.objectContaining({
-				comp_code: "cardone",
+				comp_code: "cardonecapital",
 			})
 		);
 	});
@@ -65,7 +65,7 @@ describe("GET /invoices/[id]", () => {
 	it("should return an invoice by querying for id", async () => {
 		const response = await request(app).get(`/invoices/1`);
 		expect(response.statusCode).toEqual(200);
-		expect(response.body.invoice.comp_code).toEqual("acme");
+		expect(response.body.invoice.comp_code).toEqual("acmecorp");
 	});
 
 	it("should return 404 if invoice not found", async () => {
@@ -77,11 +77,11 @@ describe("GET /invoices/[id]", () => {
 describe("POST /invoices", () => {
 	it("should post a new invoice", async () => {
 		let response = await request(app).post(`/invoices`).send({
-			comp_code: "acme",
+			comp_code: "acmecorp",
 			amt: 275,
 		});
 		expect(response.body.invoice.amt).toEqual(275);
-		expect(response.body.invoice.comp_code).toEqual("acme");
+		expect(response.body.invoice.comp_code).toEqual("acmecorp");
 	});
 });
 
@@ -89,9 +89,10 @@ describe("PUT /invoices", () => {
 	it("should update an existing invoice", async () => {
 		let response = await request(app).put(`/invoices/1`).send({
 			amt: 349,
+			paid: true
 		});
 		expect(response.body.invoice.amt).toEqual(349);
-		expect(response.body.invoice.comp_code).toEqual("acme");
+		expect(response.body.invoice.comp_code).toEqual("acmecorp");
 	});
 	it("should return 404 if invoice does not exist", async () => {
 		let response = await request(app).put(`/invoices/1209123`).send({
