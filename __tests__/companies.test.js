@@ -20,12 +20,19 @@ describe("GET /companies", () => {
 		const response = await request(app).get(`/companies`);
 		expect(response.body).toEqual({
 			companies: [
-				{ code: 'acme', name: 'ACME Corp.' },
-				{ code: 'cardone', name: 'Cardone Capital'}
+				{ code: 'acmecorp', name: 'ACME Corp.' },
+				{ code: 'cardonecapital', name: 'Cardone Capital'}
 			],
 		});
 		expect(response.body.companies.length).toEqual(2);
 	});
+
+	it("should return in json format", async () => {
+		const response = await request(app).get(`/companies`);
+        const { code } = response.body.companies[0];
+        
+		expect(code).toBe('acmecorp');
+	})
 
 	it("should return 404 if no companies in db", async () => {
 		await db.query(`DELETE FROM companies;`);
@@ -36,13 +43,13 @@ describe("GET /companies", () => {
 
 describe("GET /companies/[code]", () => {
 	it("should return a company by querying for code", async () => {
-		const response = await request(app).get(`/companies/acme`);
+		const response = await request(app).get(`/companies/acmecorp`);
 		expect(response.statusCode).toEqual(200);
-		expect(response.body.company.code).toEqual("acme");
+		expect(response.body.company.code).toEqual("acmecorp");
 	});
 
 	it("should return invoices for that company in the same object", async () => {
-		const response = await request(app).get(`/companies/acme`);
+		const response = await request(app).get(`/companies/acmecorp`);
 		expect(response.statusCode).toEqual(200);
 
 		expect(response.body.company.invoices).toContainEqual(
@@ -68,9 +75,15 @@ describe("POST /companies", () => {
 		expect(response.statusCode).toEqual(201);
 		expect(response.body.company.name).toEqual("The New Corp.");
 	});
+	it("should slugify name", async () => {
+		let response = await request(app).post(`/companies`).send({
+			name: "The New Corp.",
+			description: "We're new to the database.",
+		});
+		expect(response.body.company.code).toEqual("thenewcorp");
+	});
 	it("should throw internal error if there's no [code]", async () => {
 		let response = await request(app).post(`/companies`).send({
-			name: "no code.",
 			description: "We don't have a code.",
 		});
 		expect(response.statusCode).toEqual(500);
@@ -90,20 +103,20 @@ describe("POST /companies", () => {
 
 describe("PUT /companies/[code]", () => {
 	it("should update existing company's information", async () => {
-		let response = await request(app).put(`/companies/acme`).send({
-			code: "acme",
-			name: "acme 2.0",
+		let response = await request(app).put(`/companies/acmecorp`).send({
+			code: "acmecorp",
+			name: "acmecorp 2.0",
 			description: "The NEW Acme Corp.",
 		});
 		expect(response.statusCode).toEqual(201);
-		expect(response.body.company.name).toEqual("acme 2.0");
+		expect(response.body.company.name).toEqual("acmecorp 2.0");
 	});
 
 	it("should return 404 if company code does not exist", async () => {
 		try {
 			let response = await request(app).put(`/companies/notfound`).send({
 				code: "notfound",
-				name: "acme 2.0",
+				name: "acmecorp 2.0",
 				description: "The NEW Acme Corp.",
 			});
 			expect(response.statusCode).toEqual(404);
@@ -116,8 +129,17 @@ describe("PUT /companies/[code]", () => {
 
 describe("DELETE /companies/[code]", () => {
 	it("should delete a company from the db", async () => {
-		let response = await request(app).delete(`/companies/acme`);
+		let response = await request(app).delete(`/companies/acmecorp`);
 		expect(response.body.message).toEqual("Deleted");
+	});
+	it("should return 404 if company code does not exist", async () => {
+		try {
+			let response = await request(app).delete(`/companies/notfound`)
+			expect(response.statusCode).toEqual(404);
+			expect(response.error.text).toContain("not found");
+		} catch (err) {
+			expect(err).toEqual(err);
+		}
 	});
 });
 
