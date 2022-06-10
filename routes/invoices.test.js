@@ -7,31 +7,12 @@ const request = require("supertest");
 // app imports
 const app = require("../app");
 const db = require("../db");
+const { setUp } = require("../_test_setup");
+const { tearDown } = require("../_test_teardown");
 
-let testInvoiceA;
-let testInvoiceB;
-let testInvoiceC;
-let testInvoiceD;
+beforeEach(setUp);
 
-beforeEach(async () => {
-	let companyResult = await db.query(`
-    INSERT INTO
-      companies (code, name, description) VALUES ('acme', 'ACME Corp.', 'The ACME Company.'), ('cardone', 'Cardone Capital', 'Invest in real estate.')
-      RETURNING code, name`);
-	testCompanyA = companyResult.rows[0];
-	testCompanyB = companyResult.rows[1];
-
-	let invoicesResult = await db.query(
-		`INSERT INTO invoices (comp_code, amt, paid, paid_date) VALUES ('acme', 100, false, null),
-        ('acme', 200, false, null),
-        ('cardone', 300, true, '2018-01-01'),
-        ('cardone', 400, false, null) RETURNING id, comp_code, amt, paid, paid_date`
-	);
-	testInvoiceA = invoicesResult.rows[0];
-	testInvoiceB = invoicesResult.rows[1];
-	testInvoiceC = invoicesResult.rows[2];
-	testInvoiceD = invoicesResult.rows[3];
-});
+afterEach(tearDown);
 
 describe("GET /invoices", () => {
 	it("should return id and comp_code info", async () => {
@@ -82,13 +63,13 @@ describe("GET /invoices", () => {
 
 describe("GET /invoices/[id]", () => {
 	it("should return an invoice by querying for id", async () => {
-		const response = await request(app).get(`/invoices/${testInvoiceA.id}`);
+		const response = await request(app).get(`/invoices/1`);
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.invoice.comp_code).toEqual("acme");
 	});
 
-	it("should return 404 if company not found", async () => {
-		const response = await request(app).get(`/companies/1`);
+	it("should return 404 if invoice not found", async () => {
+		const response = await request(app).get(`/invoices/23423`);
 		expect(response.statusCode).toEqual(404);
 	});
 });
@@ -106,36 +87,25 @@ describe("POST /invoices", () => {
 
 describe("PUT /invoices", () => {
 	it("should update an existing invoice", async () => {
-		let response = await request(app)
-			.put(`/invoices/${testInvoiceA.id}`)
-			.send({
-				amt: 349,
-			});
+		let response = await request(app).put(`/invoices/1`).send({
+			amt: 349,
+		});
 		expect(response.body.invoice.amt).toEqual(349);
 		expect(response.body.invoice.comp_code).toEqual("acme");
 	});
 	it("should return 404 if invoice does not exist", async () => {
-		let response = await request(app).put(`/invoices/1`).send({
+		let response = await request(app).put(`/invoices/1209123`).send({
 			amt: 349,
 		});
-		console.log(response.body);
 
 		expect(response.statusCode).toEqual(404);
 	});
 });
 describe("DELETE /invoices/[id]", () => {
 	it("should delete invoice", async () => {
-		let response = await request(app).delete(
-			`/invoices/${testInvoiceA.id}`
-		);
+		let response = await request(app).delete(`/invoices/1`);
 		expect(response.body.message).toEqual("Deleted");
 	});
-});
-
-afterEach(async () => {
-	// delete any data created by test
-	await db.query("DELETE FROM companies");
-	await db.query("DELETE FROM invoices");
 });
 
 afterAll(async function () {
