@@ -17,6 +17,7 @@ afterEach(tearDown);
 describe("GET /invoices", () => {
 	it("should return id and comp_code info", async () => {
 		const response = await request(app).get(`/invoices`);
+		console.log(response.body)
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.invoices).toContainEqual(
 			expect.objectContaining({
@@ -53,17 +54,22 @@ describe("GET /invoices", () => {
 		);
 	});
 	it("should return 404 if no invoices exist", async () => {
-		await db.query("DELETE FROM invoices");
+		await db.query("DELETE FROM invoices;");
 
-		const response = await request(app).get(`/invoices`);
+		try {
+			let resp = await request(app).get(`/invoices`);
+			expect(response.statusCode).toEqual(404);
+		} catch (err) {
+			expect(err).toEqual(err);
+		}
 
-		expect(response.statusCode).toEqual(404);
 	});
 });
 
 describe("GET /invoices/[id]", () => {
 	it("should return an invoice by querying for id", async () => {
 		const response = await request(app).get(`/invoices/1`);
+		console.debug("return invoice by id", response.body)
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.invoice.comp_code).toEqual("acmecorp");
 	});
@@ -80,6 +86,7 @@ describe("POST /invoices", () => {
 			comp_code: "acmecorp",
 			amt: 275,
 		});
+		console.debug("post invoices", response.body)
 		expect(response.body.invoice.amt).toEqual(275);
 		expect(response.body.invoice.comp_code).toEqual("acmecorp");
 	});

@@ -29,8 +29,8 @@ CREATE TABLE industries (
 CREATE TABLE company_industry (
     id serial NOT NULL,
     company_code text NOT NULL,
-    FOREIGN KEY (company_code) REFERENCES companies(code),
+    FOREIGN KEY (company_code) REFERENCES companies(code) ON DELETE CASCADE,
     industry_code text NOT NULL,
-    FOREIGN KEY (industry_code) REFERENCES industries(code),
+    FOREIGN KEY (industry_code) REFERENCES industries(code) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );

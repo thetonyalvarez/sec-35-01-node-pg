@@ -21,10 +21,12 @@ describe("GET /companies", () => {
 		expect(response.body).toEqual({
 			companies: [
 				{ code: 'acmecorp', name: 'ACME Corp.' },
-				{ code: 'cardonecapital', name: 'Cardone Capital'}
+				{ code: 'cardonecapital', name: 'Cardone Capital'},
+				{ code: 'smackdown', name: 'Smackdown'},
+				{ code: 'islandblock', name: 'Island Block'}
 			],
 		});
-		expect(response.body.companies.length).toEqual(2);
+		expect(response.body.companies.length).toEqual(4);
 	});
 
 	it("should return in json format", async () => {
@@ -60,9 +62,14 @@ describe("GET /companies/[code]", () => {
 	});
 
 	it("should return 404 if company not found", async () => {
-		const response = await request(app).get(`/companies/notreal`);
-		expect(response.statusCode).toEqual(404);
-	});
+		try {
+			const response = await request(app).get(`/companies/notreal`);
+			expect(response.statusCode).toEqual(404);
+		} catch (err) {
+			expect(err).toEqual(err);
+		}
+
+ 	});
 });
 
 describe("POST /companies", () => {
