@@ -4,10 +4,10 @@ const db = require("./db");
 
 async function setUp() {
 	await db.query(`
+		DELETE FROM company_industry;
+		DELETE FROM industries;
 		DELETE FROM invoices;
 		DELETE FROM companies;
-		DELETE FROM industries;
-		DELETE FROM company_industry;
 		SELECT setval('invoices_id_seq', 1, false);
 		SELECT setval('company_industry_id_seq', 1, false);
 

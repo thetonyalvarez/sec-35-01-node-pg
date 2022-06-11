@@ -14,7 +14,31 @@ beforeEach(setUp);
 
 afterEach(tearDown);
 
-
+describe("POST /industries", () => {
+	it("should add a new industry to db", async () => {
+		let response = await request(app).post(`/industries`).send({
+			name: "Sports Entertainment"
+		});
+		expect(response.statusCode).toEqual(201);
+		expect(response.body.industry.name).toEqual("Sports Entertainment");
+	});
+	it("should slugify name", async () => {
+		let response = await request(app).post(`/industries`).send({
+			name: "Sports Entertainment",
+		});
+		expect(response.body.industry.code).toEqual("sportsentertainment");
+	});
+	it("should throw internal error if there's no [name]", async () => {
+		try {
+			let response = await request(app).post(`/industries`).send({
+				code: "nocode",
+			});
+			expect(response.statusCode).toEqual(500);
+		} catch (err) {
+			expect(e).toEqual(err);
+		}
+	});
+});
 
 afterAll(async function () {
 	// close db connection
