@@ -54,10 +54,23 @@ router.get("/:code", async (req, res, next) => {
 		);
 
 		const invoiceQuery = await db.query(
-			`SELECT id, amt, paid, add_date, paid_date, comp_code
+			`
+			SELECT id, amt, paid, add_date, paid_date, comp_code
 			FROM invoices
-			WHERE comp_code = $1`,
-			[code]
+			WHERE comp_code = $1
+			`, [code]
+		);
+
+		const industriesQuery = await db.query(
+			`
+			SELECT industry
+			FROM industries
+			INNER JOIN company_industry
+			ON industries.code = company_industry.industry_code
+			INNER JOIN companies
+			ON company_industry.company_code = companies.code
+			WHERE companies.code = $1
+			`, [code]
 		);
 
 		if (companyQuery.rows.length == 0) {
@@ -70,6 +83,8 @@ router.get("/:code", async (req, res, next) => {
 
 		let companyResult = companyQuery.rows[0];
 		companyResult.invoices = invoiceQuery.rows.map((i) => i);
+		companyResult.industries = industriesQuery.rows.map((i) => i.industry);
+		console.log("Company Reult", companyResult)
 
 		return res.json({ company: companyResult });
 	} catch (err) {
