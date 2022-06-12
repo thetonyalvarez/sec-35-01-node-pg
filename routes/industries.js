@@ -16,6 +16,43 @@ const slugifyConfig = {
  * GET /industries
  * Returns list of industries and company codes associated with that industry, like {industries: [{code, name, companies: [code]}, ...]}
  */
+router.get("/", async (req, res, next) => {
+	try {
+		const industriesQuery = await db.query(
+			`
+            SELECT code, name
+            FROM industries
+            `
+		);
+
+		if (industriesQuery.rows.length === 0) {
+			let notFoundError = new ExpressError(
+				`No industries exist in this database.`
+			);
+			notFoundError.status = 404;
+			throw notFoundError;
+		}
+
+        for (let i of industriesQuery.rows) {
+            let resp = await db.query(
+                `
+                SELECT companies.code
+                FROM industries
+                INNER JOIN company_industry
+                ON industries.code = company_industry.industry_code
+                INNER JOIN companies
+                ON company_industry.company_code = companies.code
+                WHERE industries.code = $1
+                `, [i.code]
+            );
+            i.companies = resp.rows.map((i) => i.code);
+        }
+
+		return res.json({ industries: industriesQuery.rows });
+	} catch (err) {
+		return next(err);
+	}
+});
 
 
 /**
