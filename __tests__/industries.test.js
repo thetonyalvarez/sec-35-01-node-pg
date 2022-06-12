@@ -41,6 +41,28 @@ describe("GET /industries", () => {
 
 });
 
+describe("GET /industries/[industry_code]", () => {
+	const industry_code = 'acct'
+
+	it("should return an industry by querying for code", async () => {
+		const response = await request(app).get(`/industries/${industry_code}`);
+		console.log('single industry', response.body)
+
+		expect(response.statusCode).toEqual(200);
+		expect(response.body.industry.code).toEqual("acct");
+		expect(response.body.industry.name).toEqual("Accounting");
+	});
+
+	it("should return 404 if industry not found", async () => {
+		try {
+			const response = await request(app).get(`/industries/thisdoesntexist`);
+			expect(response.statusCode).toEqual(404);
+		} catch (err) {
+			expect(err).toEqual(err);
+		}
+
+	});
+});
 
 describe("POST /industries", () => {
 	it("should add a new industry to db", async () => {
@@ -64,6 +86,70 @@ describe("POST /industries", () => {
 			expect(response.statusCode).toEqual(500);
 		} catch (err) {
 			expect(e).toEqual(err);
+		}
+	});
+});
+
+describe("POST /industries/[industry_code]/[company_code]", () => {
+	const industryCode = 'acct'
+	const companyCode = 'islandblock'
+
+
+	it("should add a new company to an industry", async () => {
+		let response = await request(app).post(`/industries/${industryCode}/${companyCode}`);
+
+		expect(response.statusCode).toEqual(201);
+		expect(response.body.result.industry_code).toEqual(industryCode);
+		expect(response.body.result.company_code).toEqual("islandblock");
+	});
+
+	it("should return error if company doesn't exist in companies table", async () => {
+		let response = await request(app).post(`/industries/${industryCode}/wedontexist`);
+
+		expect(response.statusCode).toEqual(404);
+	});
+
+	it("should return error if industry doesn't exist in industries table", async () => {
+		let response = await request(app).post(`/industries/thisdoesntxist/${companyCode}`);
+
+		expect(response.statusCode).toEqual(404);
+	});
+
+});
+
+// describe.only("PUT /industries", () => {
+// 	it("should add a company to an industry", async () => {
+// 		let response = await request(app).put(`/industries/acct/cardonecapital`).send({
+// 			company_code: 'acct',
+// 			industry_code: 'cardonecapital'
+// 		});
+// 		expect(response.statusCode).toEqual(201);
+// 		expect(response.body.industries.companies).toEqual(
+// 			['acmecorp', 'smackdown', 'cardonecapital']
+// 		);
+// 	});
+
+// });
+
+
+describe("DELETE /[industry_code]/[company_code]", () => {
+	const industryCode = 'acct'
+	const companyCode = 'acmecorp'
+
+	it("should delete a company/industry record from the db", async () => {
+
+		let response = await request(app).delete(`/industries/${industryCode}/${companyCode}`)
+
+		expect(response.body.message).toEqual("Deleted");
+	});
+	
+	it("should return 404 if record does not exist", async () => {
+		try {
+			let response = await request(app).delete(`/industries/${industryCode}/islandblock`)
+			expect(response.statusCode).toEqual(404);
+			expect(response.error.text).toContain("not found");
+		} catch (err) {
+			expect(err).toEqual(err);
 		}
 	});
 });
