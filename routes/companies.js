@@ -63,7 +63,7 @@ router.get("/:code", async (req, res, next) => {
 
 		const industriesQuery = await db.query(
 			`
-			SELECT industry
+			SELECT name
 			FROM industries
 			INNER JOIN company_industry
 			ON industries.code = company_industry.industry_code

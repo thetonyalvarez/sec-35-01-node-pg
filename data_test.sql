@@ -1,9 +1,9 @@
 \c biztime_test
 
+DROP TABLE IF EXISTS company_industry;
+DROP TABLE IF EXISTS industries;
 DROP TABLE IF EXISTS invoices;
 DROP TABLE IF EXISTS companies;
-DROP TABLE IF EXISTS industries;
-DROP TABLE IF EXISTS company_industry;
 
 CREATE TABLE companies (
   code text PRIMARY KEY,
@@ -23,7 +23,7 @@ CREATE TABLE invoices (
 
 CREATE TABLE industries (
     code text PRIMARY KEY,
-    industry text NOT NULL unique
+    name text NOT NULL unique
 );
 
 CREATE TABLE company_industry (
