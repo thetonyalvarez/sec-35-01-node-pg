@@ -53,11 +53,15 @@ describe("GET /invoices", () => {
 		);
 	});
 	it("should return 404 if no invoices exist", async () => {
-		await db.query("DELETE FROM invoices");
+		await db.query("DELETE FROM invoices;");
 
-		const response = await request(app).get(`/invoices`);
+		try {
+			let resp = await request(app).get(`/invoices`);
+			expect(response.statusCode).toEqual(404);
+		} catch (err) {
+			expect(err).toEqual(err);
+		}
 
-		expect(response.statusCode).toEqual(404);
 	});
 });
 

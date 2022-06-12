@@ -1,5 +1,7 @@
 \c biztime_test
 
+DROP TABLE IF EXISTS company_industry;
+DROP TABLE IF EXISTS industries;
 DROP TABLE IF EXISTS invoices;
 DROP TABLE IF EXISTS companies;
 
@@ -19,3 +21,16 @@ CREATE TABLE invoices (
   CONSTRAINT invoices_amt_check CHECK ((amt > (0)::double precision))
 );
 
+CREATE TABLE industries (
+    code text PRIMARY KEY,
+    name text NOT NULL unique
+);
+
+CREATE TABLE company_industry (
+    id serial NOT NULL,
+    company_code text NOT NULL,
+    FOREIGN KEY (company_code) REFERENCES companies(code) ON DELETE CASCADE,
+    industry_code text NOT NULL,
+    FOREIGN KEY (industry_code) REFERENCES industries(code) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);

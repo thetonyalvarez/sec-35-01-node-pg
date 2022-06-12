@@ -21,10 +21,12 @@ describe("GET /companies", () => {
 		expect(response.body).toEqual({
 			companies: [
 				{ code: 'acmecorp', name: 'ACME Corp.' },
-				{ code: 'cardonecapital', name: 'Cardone Capital'}
+				{ code: 'cardonecapital', name: 'Cardone Capital'},
+				{ code: 'smackdown', name: 'Smackdown'},
+				{ code: 'islandblock', name: 'Island Block'}
 			],
 		});
-		expect(response.body.companies.length).toEqual(2);
+		expect(response.body.companies.length).toEqual(4);
 	});
 
 	it("should return in json format", async () => {
@@ -44,6 +46,7 @@ describe("GET /companies", () => {
 describe("GET /companies/[code]", () => {
 	it("should return a company by querying for code", async () => {
 		const response = await request(app).get(`/companies/acmecorp`);
+		console.log(response.body)
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.company.code).toEqual("acmecorp");
 	});
@@ -59,9 +62,20 @@ describe("GET /companies/[code]", () => {
 		);
 	});
 
+	it("should return industries for that company in the same object", async () => {
+		const response = await request(app).get(`/companies/acmecorp`);
+
+		expect(response.body.company.industries).toContain('Accounting');
+	});
+
 	it("should return 404 if company not found", async () => {
-		const response = await request(app).get(`/companies/notreal`);
-		expect(response.statusCode).toEqual(404);
+		try {
+			const response = await request(app).get(`/companies/notreal`);
+			expect(response.statusCode).toEqual(404);
+		} catch (err) {
+			expect(err).toEqual(err);
+		}
+
 	});
 });
 
