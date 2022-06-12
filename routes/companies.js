@@ -52,7 +52,7 @@ router.get("/:code", async (req, res, next) => {
 			WHERE code = $1`,
 			[code]
 		);
-
+		
 		const invoiceQuery = await db.query(
 			`
 			SELECT id, amt, paid, add_date, paid_date, comp_code
@@ -60,10 +60,10 @@ router.get("/:code", async (req, res, next) => {
 			WHERE comp_code = $1
 			`, [code]
 		);
-
+			
 		const industriesQuery = await db.query(
 			`
-			SELECT name
+			SELECT industries.name
 			FROM industries
 			INNER JOIN company_industry
 			ON industries.code = company_industry.industry_code
@@ -83,8 +83,8 @@ router.get("/:code", async (req, res, next) => {
 
 		let companyResult = companyQuery.rows[0];
 		companyResult.invoices = invoiceQuery.rows.map((i) => i);
-		companyResult.industries = industriesQuery.rows.map((i) => i.industry);
-		console.log("Company Reult", companyResult)
+		companyResult.industries = industriesQuery.rows.map((i) => i.name);
+		console.log("Company Result", companyResult.industries)
 
 		return res.json({ company: companyResult });
 	} catch (err) {

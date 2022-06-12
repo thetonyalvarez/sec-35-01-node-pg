@@ -46,7 +46,6 @@ describe("GET /companies", () => {
 describe("GET /companies/[code]", () => {
 	it("should return a company by querying for code", async () => {
 		const response = await request(app).get(`/companies/acmecorp`);
-		console.log(response.body)
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.company.code).toEqual("acmecorp");
 	});
