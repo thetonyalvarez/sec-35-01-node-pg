@@ -27,6 +27,11 @@ If you delete a company, all associated invoices with that company will also be 
         -   [Add an Invoice](#add-an-invoice)
         -   [Update an Invoice](#update-an-invoice)
         -   [Delete an Invoice](#delete-an-invoice)
+    -   [Industries](#industries)
+        -   [Create an Industry](#create-an-industry)
+        -   [View an Industry](#view-an-industry)
+        -   [View all Industries](#view-all-industries)
+        -   [Delete an Industry](#delete-an-industry)
 -   [Roadmap](#roadmap)
 
 #
@@ -191,6 +196,39 @@ To delete an invoice, make a `DELETE` request to `/invoices/[INVOICE ID]`:
 $ curl http://localhost:5000/invoices/[INVOICE ID] -X DELETE
 ```
 
+# 
+
+### Industries
+
+#### Create an Industry
+To add a new industry to the `industries` table, make a `POST` request to `/industries` and pass the `industry_code` as a URL parameter as follows:
+
+```console
+$ curl http://localhost:5000/industries/[industry_code] -X POST
+```
+
+#### View an Industry
+To view an industry in the database, make a `GET` request to `/industries` and pass the `industry_code` as a URL parameter as follows:
+
+```console
+$ curl http://localhost:5000/industries/[industry_code]
+```
+#### View all Industries
+
+To view all industries in the database, make a `GET` request to `/industries`:
+
+```console
+$ curl http://localhost:5000/industries
+```
+#### Delete an Industry
+To delete an industry, make a `DELETE` request by passing the industry code and company code to the `industries` path as follows:
+`/industries/[industry_code]/[company_code]`:
+
+```console
+$ curl http://localhost:5000/industries/[industry_code]/[company_code] -X DELETE
+```
+
+If either the `industry_code` or `company_code` does not exist, you will receive an error.
 #
 
 ## Roadmap
