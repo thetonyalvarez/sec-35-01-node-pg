@@ -117,21 +117,6 @@ describe("POST /industries/[industry_code]/[company_code]", () => {
 
 });
 
-// describe.only("PUT /industries", () => {
-// 	it("should add a company to an industry", async () => {
-// 		let response = await request(app).put(`/industries/acct/cardonecapital`).send({
-// 			company_code: 'acct',
-// 			industry_code: 'cardonecapital'
-// 		});
-// 		expect(response.statusCode).toEqual(201);
-// 		expect(response.body.industries.companies).toEqual(
-// 			['acmecorp', 'smackdown', 'cardonecapital']
-// 		);
-// 	});
-
-// });
-
-
 describe("DELETE /[industry_code]/[company_code]", () => {
 	const industryCode = 'acct'
 	const companyCode = 'acmecorp'
