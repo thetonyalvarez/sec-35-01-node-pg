@@ -14,6 +14,34 @@ beforeEach(setUp);
 
 afterEach(tearDown);
 
+describe("GET /industries", () => {
+	it("should return all industries in db", async () => {
+		const response = await request(app).get(`/industries`);
+		console.log(response.body)
+		expect(response.body.industries[0]).toEqual({
+				code: 'acct',
+				name: 'Accounting',
+				companies: ['acmecorp', 'smackdown'],
+		});
+		expect(response.body.industries.length).toEqual(4);
+	});
+
+	it("should return in json format", async () => {
+		const response = await request(app).get(`/industries`);
+        const { code } = response.body.industries[0];
+        
+		expect(code).toBe('acct');
+	})
+
+	it("should return 404 if no industries in db", async () => {
+		await db.query(`DELETE FROM industries;`);
+		const response = await request(app).get(`/industries`);
+		expect(response.statusCode).toEqual(404);
+	});
+
+});
+
+
 describe("POST /industries", () => {
 	it("should add a new industry to db", async () => {
 		let response = await request(app).post(`/industries`).send({
